@@ -2,21 +2,13 @@
 #include <wiringPiI2C.h>
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
 #include <lcd.h>
 #include <string>
 #include <unistd.h>
 
 using namespace std;
 #include "explorerHat.hpp"
-
-PI_THREAD(range_thread)
-{
-	RangeFinder range;
-	while(1) {
-		printf("distance = %d cm\n", range.read_distance());
-		delay(2000);
-	}
-}
 
 PI_THREAD(touch_thread)
 {
@@ -26,6 +18,13 @@ PI_THREAD(touch_thread)
 	Light blue(BLUE);
 	Light green(GREEN);
 	Light yellow(YELLOW);
+	RangeFinder range;
+
+	FILE *fp;
+	char buffer[1024];
+	stringstream s;
+	string str;
+
 	int i=0,j=0;
 	while(1) {
 		while(!(i = touch.read())) ;
@@ -34,11 +33,23 @@ PI_THREAD(touch_thread)
 			switch(i) {
 				case 1: 
 					blue.blink(); 
-					lcd.puts(string("1"));
+					fp = popen("who", "r");
+					if( fp == NULL) perror("popen() error");
+					while(fgets(buffer, 1024, fp)) lcd.puts(string(buffer));
+					pclose(fp);
 					break;
 				case 2: 
 					yellow.blink(); 
-					lcd.puts(string("2")); 
+				
+					for(int i=0; i<5; i++) {
+						s.str("");
+						s << range.read_distance();
+						str = "distance= " + s.str() + "cm";
+						lcd.cursor(0,0);
+						lcd.clear();
+						lcd.puts(str);
+						delay(2000);
+					}
 					break;
 				case 3: 
 					red.blink(); 
@@ -64,7 +75,6 @@ int main()
 {
 	wiringPiSetupGpio();
 	
-	piThreadCreate(range_thread);
 	piThreadCreate(touch_thread);
 
 	char ch;
