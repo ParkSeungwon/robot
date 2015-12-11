@@ -6,6 +6,6 @@ robot : $(OBJ)
 
 main.o : main.cc
 	$(CC) -c main.cc
-explorerHat.o : explorerHat.cc
+explorerHat.o : explorerHat.cc explorerHat.hpp
 	$(CC) -c explorerHat.cc
 

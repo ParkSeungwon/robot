@@ -70,6 +70,7 @@ public:
 	~Stepper() {to_angle(0);}
 	void clock(int step);
 	int to_angle(int a);//-128~128 180 degree
+	int get_angle() {return angle;}
 
 private:
 	int s[4];
