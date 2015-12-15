@@ -204,6 +204,7 @@ void Stepper::counter_clock(int step)
 			}
 			delay(1);
 		}
+		angle--;
 	}
 }
 
@@ -218,6 +219,7 @@ void Stepper::clock(int step)
 				}
 				delay(1);
 			}
+			angle++;
 		}
 	}
 }
@@ -249,7 +251,7 @@ int RangeFinder::read_distance()
 	start = micros();
 	while(digitalRead(ECHO) == 1);
 	stop = micros();
-	printf("start= %d", start);
-	printf("stop= %d", stop);
+	//printf("start= %d", start);
+	//printf("stop= %d", stop);
 	return (stop - start)/40;
 }

@@ -10,90 +10,63 @@
 using namespace std;
 #include "explorerHat.hpp"
 
+Motor *mt;
+Pwm *servo;
+Stepper *step;
+RangeFinder *range;
+Lcd *lcd;
+
+string command_str[5][5];
+int fd, command;
+int command_func(int);
+int execute_command(int);
+
 int main()
 {
+	mt = new Motor;
+	servo = new Pwm;
+	step = new Stepper;
+	range = new RangeFinder;
+	lcd = new Lcd;
+
+	command_str[0][1] = "command list";
+	command_str[1][2] = "w";
+	command_str[0][2] = "range finder";
+	command_str[0][3] = "test motors";
+	command_str[0][4] = "I2C write";
+	command_str[1][1] = "I2C read";
+	command_str[4][4] = "shutdown";
+
 	wiringPiSetupGpio();
-	
+	fd = wiringPiI2CSetup(0x04);
 	char ch;
-	Motor mt;
-	Pwm servo;
-	Stepper step;
+	
 	int p = 50;
 	int a = 0;
 	
 	Touch touch;
-	Lcd lcd;
 	Light red(RED);
 	Light blue(BLUE);
 	Light green(GREEN);
 	Light yellow(YELLOW);
-	RangeFinder range;
 
-	FILE *fp;
-	char buffer[1024];
-	stringstream s;
 	string str;
 
 	int i=0,j=0;
+	int command = 0;
 	while(1) {
 		while(!(i = touch.read())) ;
 		if(i == j) j = 0;//to avoid twice hitting
 		else {
 			switch(i) {
-				case 1: 
-					blue.blink(); 
-					fp = popen("who", "r");
-					if( fp == NULL) perror("popen() error");
-					while(fgets(buffer, 1024, fp)) lcd.puts(string(buffer));
-					pclose(fp);
-					break;
-					
-				case 2: 
-					yellow.blink(); 
-				
-					for(int i=0; i<5; i++) {
-						s.str("");//clear stringstream or it stacks
-						s << range.read_distance();
-						str = "distance= " + s.str() + "cm";
-						lcd.cursor(0,0);
-						lcd.clear();
-						lcd.puts(str);
-						delay(2000);
-					}
-					break;
-					
-				case 3: 
-					red.blink(); 
-					mt.fw();
-					step.clock(100);
-					servo.pulse(70);
-					//for(int i; i<10; i++) {
-					//	servo.pulse(-50 + 10*i);
-					//	delay(100);
-					//}
-					delay(2000);
-					mt.bw();
-					step.clock(-200);
-					servo.pulse(50);
-					delay(2000);
-					mt.stop();
-
-					lcd.puts(string("3"));
-					break;
-					
-				case 4: 
-					green.blink();
-					lcd.puts(string("4"));
-					break;
-					
-				case 8: lcd.clear(); break;
-				
-				case 5: 
-					lcd.puts(string("ending"));
-					execl("/usr/bin/sudo", "/usr/bin/sudo", "/sbin/shutdown", "-h", "now");
+				case 1: blue.blink(); break;		
+				case 2: yellow.blink(); break;
+				case 3: red.blink(); 	break;
+				case 4: green.blink(); 	break;
 				default: ;
 			}
 			j = i;
+			command_func(i);
 		}
 	}
 	
@@ -117,3 +90,106 @@ int main()
 //		}}
 	
 }
+
+int command_func(int i) {
+	stringstream s;
+	if(i >= 1 && i <= 4) {
+		command = 10 * command + i;
+		if(command > 99) command /= 10;
+	}
+	else if(i == 8) execute_command(command);
+	else if(i == 7) command = command / 10; 
+	
+	s.str("");
+	s << command;
+	lcd->clear();
+	lcd->cursor(0, 0);
+	lcd->puts(s.str());
+	lcd->cursor(1, 0);
+	lcd->puts(command_str[command/10][command%10]);
+	return command;
+}
+
+int execute_command(int com) {
+	stringstream s;
+	string st;
+	int k = 0;
+	FILE* fp;
+	char buffer[1024];
+
+	switch(com) {
+		case 1:
+			lcd->clear();
+			for(int i=0; i<=4; i++) {
+				for(int j=0; j<=4; j++) {
+					if(command_str[i][j] != "") {
+						s.str("");
+						s << i*10+j;
+						st = s.str() + ". " + command_str[i][j];
+						lcd->cursor(k++ % 2, 0);
+						lcd->puts(st);
+						lcd->puts(string("                  "));	
+						delay(500);
+					}
+				}
+			}
+			break;
+		case 12:
+			fp = popen("who", "r");
+			if( fp == NULL) perror("popen() error");
+			while(fgets(buffer, 1024, fp)) lcd->puts(string(buffer));
+			pclose(fp);
+			break;
+		case 2:
+			for(int i=0; i<5; i++) {
+				lcd->clear();
+				s.str("");//clear stringstream or it stacks
+				s << range->read_distance();
+				st = "distance= " + s.str() + "cm";
+				s.str("");
+				s << step->get_angle();
+						
+				lcd->cursor(0,0);
+				lcd->puts(st);
+				lcd->cursor(0,1);
+				st = "at angle " + s.str();
+				lcd->puts(st);
+				delay(2000);
+			}
+			break;
+		case 3:
+			mt->fw();
+			step->clock(100);
+					//servo.pulse(70);
+					//for(int i; i<10; i++) {
+					//	servo.pulse(-50 + 10*i);
+					//	delay(100);
+					//}
+			delay(2000);
+			mt->bw();
+			step->clock(-200);
+				//servo.pulse(50);
+			delay(2000);
+			mt->stop();
+
+			lcd->puts(string("3"));
+			break;
+		case 4:
+			wiringPiI2CWrite(fd, 30);
+			break;
+		case 11:
+			s.str("");
+			s << wiringPiI2CRead(fd);
+			lcd->clear();
+			lcd->puts(s.str());
+			break;
+		case 44:
+			lcd->puts(string("ending"));
+			execl("/usr/bin/sudo", "/usr/bin/sudo", "/sbin/shutdown", "-h", "now");
+			break;
+		default:
+			;
+			
+	}
+}
+

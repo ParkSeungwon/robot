@@ -5,7 +5,7 @@ robot : $(OBJ)
 	$(CC) -o robot $(OBJ) -lwiringPi -lwiringPiDev
 
 main.o : main.cc
-	$(CC) -c main.cc
+	$(CC) -c -g main.cc
 explorerHat.o : explorerHat.cc explorerHat.hpp
-	$(CC) -c explorerHat.cc
+	$(CC) -c -g explorerHat.cc
 
