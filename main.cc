@@ -102,7 +102,8 @@ int command_func(int i) {
 	lcd.clear();
 	lcd.cursor(0, 0);
 	lcd.puts(s.str());
-	lcd.cursor(1, 0);
+	
+	lcd.puts(". ");
 	lcd.puts(command_str[command/10][command%10]);
 	return command;
 }
@@ -122,11 +123,11 @@ int execute_command(int com) {
 					if(command_str[i][j] != "") {
 						s.str("");
 						s << i*10+j;
-						st = s.str() + ". " + command_str[i][j];
-						lcd.cursor(k++ % 2, 0);
+						st = s.str() + string(". ") + command_str[i][j];
+						lcd.cursor(0, k++ % 2);
 						lcd.puts(st);
-						lcd.puts(string("                  "));	
-						delay(500);
+						for(int i=0; i<16-st.length(); i++) lcd.puts(string(" "));	
+						delay(1000);
 					}
 				}
 			}
@@ -179,14 +180,13 @@ int execute_command(int com) {
 			s << wiringPiI2CRead(fd);
 			lcd.clear();
 			lcd.puts(s.str());
+			delay(2000);
 			break;
 		case 44:
 			lcd.puts(string("ending"));
 			execl("/usr/bin/sudo", "/usr/bin/sudo", "/sbin/shutdown", "-h", "now");
 			break;
-		default:
-			;
-			
+		default:;
 	}
 }
 
