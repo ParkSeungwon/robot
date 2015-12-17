@@ -20,8 +20,8 @@ public:
 	Lcd(int data = 15, int clock = 8, int latch = 14);
 	void clear() {lcdClear(fd);}
 	void cursor(int x, int y) {lcdPosition(fd, x, y);}
-	void puts(string s) {lcdPuts(fd, s.c_str());}
-
+	void puts(string s);
+	
 protected:
 	int fd;
 

@@ -64,6 +64,11 @@ Lcd::Lcd(int data, int clock, int latch)
 	fd = lcdInit(2, 16, 4, 100, 101, 102, 103, 104, 105, 0, 0, 0, 0);
 }
 
+void Lcd::puts(string s) {
+	lcdPuts(fd, s.c_str());
+	printf("%s", s.c_str());
+}
+
 Touch::Touch()
 {
 	fd = wiringPiI2CSetup(0x28);
