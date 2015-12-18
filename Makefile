@@ -2,12 +2,13 @@ CC = g++
 OBJ = explorerHat.o main.o 
 LIB = -lwiringPi -lwiringPiDev
 
+all : robot irremote
 robot : $(OBJ)
 	$(CC) -o robot $(OBJ) -lwiringPi -lwiringPiDev
-test : test.o
-	$(CC) -o test test.o explorerHat.o $(LIB) 
-test.o : test.cc
-	$(CC) -c test.cc 
+irremote : irremote.o explorerHat.o
+	$(CC) -o irremote irremote.o explorerHat.o $(LIB) 
+irremote.o : irremote.cc 
+	$(CC) -c irremote.cc 
 main.o : main.cc
 	$(CC) -c -g main.cc
 explorerHat.o : explorerHat.cc explorerHat.hpp

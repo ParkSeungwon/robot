@@ -8,7 +8,7 @@ using namespace std;
 #include <lcd.h>
 #include "explorerHat.hpp"
 #include <time.h>
-
+#include <iostream>
 
 bool Stepper::stp[8][4] = {
 		{1,0,0,0},
@@ -66,7 +66,8 @@ Lcd::Lcd(int data, int clock, int latch)
 
 void Lcd::puts(string s) {
 	lcdPuts(fd, s.c_str());
-	printf("%s", s.c_str());
+	cout << s;
+	if(s != " ") cout << endl;
 }
 
 Touch::Touch()
@@ -118,10 +119,10 @@ int Pwm::pulse(int pl)
 Motor::Motor(int rf, int rb, int lf, int lb)
 {
 	RF = rf; RB = rb; LF = lf; LB = lb;
-	pinMode(26, OUTPUT);//RF
-	pinMode(21, OUTPUT);//RB
-	pinMode(19, OUTPUT);//LF
-	pinMode(20, OUTPUT);//LB
+	pinMode(RF, OUTPUT);//RF
+	pinMode(RB, OUTPUT);//RB
+	pinMode(LF, OUTPUT);//LF
+	pinMode(LB, OUTPUT);//LB
 }
 
 void Motor::rf()

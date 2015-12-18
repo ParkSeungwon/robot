@@ -30,6 +30,7 @@ int main()
 	command_str[0][4] = "I2C write";
 	command_str[1][1] = "I2C read";
 	command_str[4][4] = "shutdown";
+	command_str[1][3] = "camera on";
 
 //	Lcd lcd2;
 //	lcd2.clear();
@@ -88,6 +89,29 @@ int main()
 	
 }
 
+int next_command(int com) {
+	for(int i=0; i<=4; i++) {
+		for(int j=0; j<=4; j++) {
+			if(command_str[i][j] != "") {
+				if(i*10+j > com) return i*10+j;
+			}
+		}
+	}
+	return 1;// circle  to first
+}
+
+int prev_command(int com) {
+	for(int i=4; i>=0; i--) {
+		for(int j=4; j>=0; j--) {
+			if(command_str[i][j] != "") {
+				if(i*10+j < com) return i*10+j;
+			}
+		}
+	}
+	return 44;//circle to last
+}
+
+
 int command_func(int i) {
 	stringstream s;
 	if(i >= 1 && i <= 4) {
@@ -96,7 +120,9 @@ int command_func(int i) {
 	}
 	else if(i == 8) execute_command(command);
 	else if(i == 7) command = command / 10; 
-	
+	else if(i == 5) command = next_command(command);
+	else if(i == 6) command = prev_command(command);
+
 	s.str("");
 	s << command;
 	lcd.clear();
@@ -105,6 +131,8 @@ int command_func(int i) {
 	
 	lcd.puts(". ");
 	lcd.puts(command_str[command/10][command%10]);
+	lcd.cursor(0,1);
+	lcd.puts("8:x,7:<-,5:+,6:-");
 	return command;
 }
 
@@ -118,6 +146,7 @@ int execute_command(int com) {
 	switch(com) {
 		case 1:
 			lcd.clear();
+			k = 0;
 			for(int i=0; i<=4; i++) {
 				for(int j=0; j<=4; j++) {
 					if(command_str[i][j] != "") {
@@ -137,6 +166,7 @@ int execute_command(int com) {
 			if( fp == NULL) perror("popen() error");
 			while(fgets(buffer, 1024, fp)) lcd.puts(string(buffer));
 			pclose(fp);
+			delay(2000);
 			break;
 		case 2:
 			for(int i=0; i<5; i++) {
@@ -182,10 +212,17 @@ int execute_command(int com) {
 			lcd.puts(s.str());
 			delay(2000);
 			break;
+		
 		case 44:
 			lcd.puts(string("ending"));
 			execl("/usr/bin/sudo", "/usr/bin/sudo", "/sbin/shutdown", "-h", "now");
 			break;
+
+		case 13:
+			lcd.puts(string("camera on"));
+			execl("raspvid", "raspvid", "-t", "999999", "-w", "800", "-h", "600", "-o", "–", "|", "nc", "192.168.0.5", "5001");
+			break;
+
 		default:;
 	}
 }

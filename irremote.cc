@@ -17,6 +17,7 @@ int main()
 	int fd = wiringPiI2CSetup(0x04);
 	Motor mt;
 	Stepper step;
+	Lcd lcd;
 
 	int i2c, i2c_back, flag;
 	while(1) {
@@ -42,7 +43,8 @@ int main()
 				case 173://9
 					mt.rb(); break;
 				case 151://0
-
+					lcd.puts(string("lcd"));
+					break;
 				case 253://+
 				case 103://-
 					break;
@@ -51,7 +53,9 @@ int main()
 				case 31://<<
 					step.clock(-10); flag = -1; break;
 				case 87://>
-
+					cout << "Run" << endl << "nc -l -p 5001 | mplayer -fps 31 -cache 1024 -" << endl;
+					system("raspivid -t 15000 -w 800 -h 600 -o - | nc 192.168.0.5 5001");
+					break;
 				case 79://C
 				case 221://TEST
 				case 61://undo
@@ -71,14 +75,4 @@ int main()
 				else if(flag == -1) step.clock(-10);
 		}
 	}
-
-	Lcd lcd;
-	lcd.clear();
-	string s = "test";
-	lcd.cursor(0,0);
-	lcd.puts(s);
-	delay(1000);
-	Light red(RED);
-	red.on();
-	delay(1000);
 }
