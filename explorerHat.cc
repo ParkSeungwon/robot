@@ -60,6 +60,7 @@ bool Light::toggle()
 Lcd::Lcd(int data, int clock, int latch)
 {
 	DPIN = data; CPIN = clock; LPIN = latch;
+	wiringPiSetupGpio();//to be sure to operate
 	sr595Setup(100, 6, DPIN, CPIN, LPIN);
 	fd = lcdInit(2, 16, 4, 100, 101, 102, 103, 104, 105, 0, 0, 0, 0);
 }
@@ -260,4 +261,16 @@ int RangeFinder::read_distance()
 	//printf("start= %d", start);
 	//printf("stop= %d", stop);
 	return (stop - start)/40;
+}
+
+Input::Input() {
+	in[0] = 23;
+	in[1] = 22;
+	in[2] = 24;
+	in[3] = 25;
+	for(int i=0; i<4; i++) pinMode(in[i], INPUT_PULLUP);
+}
+
+bool Input::read(int num) {
+	return digitalRead(in[num-1]);
 }

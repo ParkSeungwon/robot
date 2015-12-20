@@ -39,6 +39,16 @@ protected:
 	int fd;
 };
 
+class Input
+{
+public:
+	Input();
+	read(int i);
+
+protected:
+	int in[4];
+}
+
 class Pwm
 {
 public:

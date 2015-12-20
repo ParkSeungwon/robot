@@ -9,12 +9,11 @@
 
 using namespace std;
 #include "explorerHat.hpp"
-
+Lcd lcd;
 Motor mt;
 Pwm servo;
 Stepper step;
 RangeFinder range;
-Lcd lcd;
 
 string command_str[5][5];
 int fd, command;

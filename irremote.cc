@@ -22,6 +22,15 @@ int main()
 	int i2c, i2c_back, flag;
 	while(1) {
 		i2c = wiringPiI2CRead(fd);
+		if(i2c > 1000) {
+			stringstream t, h;
+			t << i2c/1000;
+			h << i2c%1000;
+			lcd.cursor(0,0);
+			lcd.puts(t.str());
+			lcd.cursor(0,1);
+			lcd.puts(h.str());
+		}
 		if(i2c != i2c_back) {
 			switch(i2c) {
 				case 207://1
