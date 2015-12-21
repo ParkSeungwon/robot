@@ -22,7 +22,7 @@ int main()
 	int i2c, i2c_back, flag;
 	while(1) {
 		i2c = wiringPiI2CRead(fd);
-		if(i2c > 1000) {
+		/*if(i2c > 1000) {
 			stringstream t, h;
 			t << i2c/1000;
 			h << i2c%1000;
@@ -30,7 +30,7 @@ int main()
 			lcd.puts(t.str());
 			lcd.cursor(0,1);
 			lcd.puts(h.str());
-		}
+		}*/
 		if(i2c != i2c_back) {
 			switch(i2c) {
 				case 207://1
@@ -68,6 +68,7 @@ int main()
 				case 79://C
 				case 221://TEST
 				case 61://undo
+					break;
 				case 29://menu
 					cout << "menu" << endl;
 					mt.fw();
@@ -82,6 +83,18 @@ int main()
 		if(i2c == 255) {
 				if(flag == 1) step.clock(10);
 				else if(flag == -1) step.clock(-10);
+		}
+		if(i2c >= 10000) {
+			cout << i2c;
+			int k,x,y;
+			k = i2c / 10000;
+			x = (i2c % 10000) / 100;
+			y = i2c % 100;
+			if(x >= 60) mt.rf();
+			if(x <= 40) mt.lf();
+			if(y >= 60) mt.fw();
+			if(y <= 40) mt.bw();
+			if(k == 2) mt.stop();
 		}
 	}
 }

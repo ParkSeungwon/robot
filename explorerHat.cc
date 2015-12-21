@@ -268,7 +268,7 @@ Input::Input() {
 	in[1] = 22;
 	in[2] = 24;
 	in[3] = 25;
-	for(int i=0; i<4; i++) pinMode(in[i], INPUT_PULLUP);
+	for(int i=0; i<4; i++) pinMode(in[i], INPUT);
 }
 
 bool Input::read(int num) {

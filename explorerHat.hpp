@@ -43,11 +43,11 @@ class Input
 {
 public:
 	Input();
-	read(int i);
+	bool read(int i);
 
 protected:
 	int in[4];
-}
+};
 
 class Pwm
 {
