@@ -22,3 +22,6 @@ lcd.o :
 stepper.o :
 motor.o :
 analog.o :
+funcs.o :
+console.o :
+
