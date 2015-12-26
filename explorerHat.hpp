@@ -1,3 +1,7 @@
+#pragma once
+#include <string>
+#include <stdint.h>
+
 enum Color { BLUE = 4, YELLOW = 17, RED = 27, GREEN = 5 };
 
 class Light
@@ -18,9 +22,9 @@ class Lcd
 {
 public:
 	Lcd(int data = 15, int clock = 8, int latch = 14);
-	void clear() {lcdClear(fd);}
-	void cursor(int x, int y) {lcdPosition(fd, x, y);}
-	void puts(string s);
+	void clear();
+	void cursor(int x, int y);
+	void puts(std::string s);
 	
 protected:
 	int fd;
@@ -98,3 +102,16 @@ public:
 private:
 	int ECHO, TRIG;
 };
+
+class Analog
+{
+public:
+	Analog(int ch);
+	uint16_t read(int gain, uint8_t sampling_bit = 0x0080);
+
+protected:
+	int fd;
+	uint8_t channel_bit;
+	static uint8_t gain_bit[6];
+};
+

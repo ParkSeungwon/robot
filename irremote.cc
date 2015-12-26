@@ -5,11 +5,9 @@
 #include <stdlib.h>
 #include <sstream>
 #include <lcd.h>
-#include <string>
 #include <unistd.h>
-
-using namespace std;
 #include "explorerHat.hpp"
+using namespace std;
 
 int main()
 {
@@ -83,18 +81,6 @@ int main()
 		if(i2c == 255) {
 				if(flag == 1) step.clock(10);
 				else if(flag == -1) step.clock(-10);
-		}
-		if(i2c >= 10000) {
-			cout << i2c;
-			int k,x,y;
-			k = i2c / 10000;
-			x = (i2c % 10000) / 100;
-			y = i2c % 100;
-			if(x >= 60) mt.rf();
-			if(x <= 40) mt.lf();
-			if(y >= 60) mt.fw();
-			if(y <= 40) mt.bw();
-			if(k == 2) mt.stop();
 		}
 	}
 }
