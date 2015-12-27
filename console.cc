@@ -1,7 +1,10 @@
 #include "console.h"
 #include <sstream>
+#include <wiringPiI2C.h>
 
 Console::Console() {
+	fd = wiringPiI2CSetup(0x04);
+	
 	command_str[0][1] = "command list";
 	command_str[1][2] = "w";
 	command_str[0][2] = "range finder";
@@ -11,14 +14,14 @@ Console::Console() {
 	command_str[4][4] = "shutdown";
 	command_str[1][3] = "camera on";
 	
-	func_ptr[0][1] = &command_list;
-	func_ptr[1][2] = &w;
-	func_ptr[0][2] = &range_finder;
-	func_ptr[0][3] = &test_motors;
-	func_ptr[0][4] = &I2C_write;
-	func_ptr[1][1] = &I2C_read;
-	func_ptr[4][4] = &shutdown;
-	func_ptr[1][3] = &camera_on;
+	func_ptr[0][1] = &Console::command_list;
+	func_ptr[1][2] = &Console::w;
+	func_ptr[0][2] = &Console::range_finder;
+	func_ptr[0][3] = &Console::test_motors;
+	func_ptr[0][4] = &Console::I2C_write;
+	func_ptr[1][1] = &Console::I2C_read;
+	func_ptr[4][4] = &Console::shutdown;
+	func_ptr[1][3] = &Console::camera_on;
 }
 
 
@@ -28,7 +31,7 @@ int Console::command_func(int i) {
 		command = 10 * command + i;
 		if(command > 99) command /= 10;
 	}
-	else if(i == 8) func_ptr[command/10][command%10]();
+	else if(i == 8) (this->*func_ptr[command/10][command%10])();
 	else if(i == 7) command = command / 10; 
 	else if(i == 5) command = next_command();
 	else if(i == 6) command = prev_command();

@@ -1,20 +1,22 @@
+#pragma once
 #include "explorerHat.hpp"
 
 class Console
 {
 public:
 	Console();	
-	static int command_func(int c);
+	int command_func(int c);
 
 protected:
 	std::string command_str[5][5];
-	void (*func_ptr)[5][5]();
-	static Lcd lcd;
+	void (Console::*func_ptr[5][5])();
+	Lcd lcd;
 	
 private:
 	int next_command();
 	int prev_command();
 	int command;
+	int fd;
 
 	void command_list();
 	void w();

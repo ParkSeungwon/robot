@@ -1,10 +1,15 @@
 #include "console.h"
 #include <sstream>
 #include <unistd.h>
+#include <wiringPi.h>
+#include <wiringPiI2C.h>
+#include <stdio.h>
 using namespace std;
 
 void Console::command_list() {
 	lcd.clear();
+	stringstream s;
+	string st;
 	int k = 0;
 	for(int i=0; i<=4; i++) {
 		for(int j=0; j<=4; j++) {
@@ -22,6 +27,7 @@ void Console::command_list() {
 }
 
 void Console::w() {
+	char buffer[1024];
 	FILE* fp = popen("who", "r");
 	if(fp == NULL) perror("popen() error");
 	while(fgets(buffer, 1024, fp)) lcd.puts(string(buffer));
@@ -32,6 +38,8 @@ void Console::w() {
 void Console::range_finder() {
 	RangeFinder range;
 	stringstream s;
+	string st;
+	Stepper step;
 	for(int i=0; i<5; i++) {
 		lcd.clear();
 		s.str("");//clear stringstream or it stacks
@@ -81,7 +89,6 @@ void Console::camera_on() {
 
 void Console::I2C_read() {
 	stringstream s;
-	FILE* fd;
 	s.str("");
 	s << wiringPiI2CRead(fd);
 	lcd.clear();
