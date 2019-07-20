@@ -1,3 +1,7 @@
 *.o
 *~
 *.swp
+find
+.
+-size
++3M
